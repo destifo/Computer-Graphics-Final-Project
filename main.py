@@ -261,5 +261,52 @@ def check_collision(bird_pos, x, blocks_y_pos):
     
 pipe_len = 2
 
+def main():
+    global prev_block_pos, pipe_len
+    a=-0.005
+    b=-0.006
+    bg = Backgroundimage()
+    bird = Bird()
+    while True:
+        y=round(random.uniform(-0.60, 0.60), 2)
+        prev_block_pos += 2
+        if (prev_block_pos % 500 == 0):
+            pipe = Pipe(translate=(-0.5,0.05+y))
+            pipe2= Pipe(translate=(-0.5,-2.25+y))
+            pipes.append(pipe)
+            pipes.append(pipe2)  
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    bird.update(0,0.15)
+                    pass
+        glClear(GL_COLOR_BUFFER_BIT)
+        start = Start(vertex="bg.vertex.shader",fragment="bg.fragment.shader")
+        glBindVertexArray(bg.Bgvao)
+        glBindTexture(GL_TEXTURE_2D, bg.tex.texture)
+
+        glDrawArrays(GL_TRIANGLES, 0, 6)
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+        glBindVertexArray(0)
+        glBindVertexArray(bird.birdVao)
+        glBindTexture(GL_TEXTURE_2D, bird.tex.texture)
+        bird.update(0,b)
+        glDrawArrays(GL_TRIANGLES, 0, 6)
+        glBindTexture(GL_TEXTURE_2D, 0)
+        glBindVertexArray(0)
+        
+        
+        # start = Start(vertex="triangle.vertex.shader",fragment="triangle.fragment.shader")
+        for i in pipes:
+            glBindVertexArray(i.pipeVAO)
+            glBindTexture(GL_TEXTURE_2D, i.tex.texture)
+            i.update(a,0)
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
+        glBindVertexArray(0)
+
 
 
