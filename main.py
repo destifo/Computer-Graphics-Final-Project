@@ -7,6 +7,78 @@ from pygame.locals import *
 import numpy as np
 
 
+class Backgroundimage:
+     def __init__(self):
+        start = Start(vertex="bg.vertex.shader",fragment="bg.fragment.shader")
+        self.Bgvertexes = np.array([
+        # position          # color           # texture s, r
+        [1, 1, 0,    1.0, 0.20, 0.8, 1.0, 1.0],
+        [1, -1, 0,   1.0, 1.0, 0.0, 1.0, 0.0],
+        [-1, 1, 0,   0.0, 0.7, 0.2, 0.0, 1.0],
+
+        [1, -1, 0,   1.0, 1.0, 0.0, 1.0, 0.0],
+        [-1, -1, 0,  0.0, 0.4, 1.0, 0.0, 0.0],
+        [-1, 1, 0,   0.0, 0.7, 0.2, 0.0, 1.0],
+
+    ], dtype=np.float32)
+
+        self.Bgvao = glGenVertexArrays(1)
+        self.Bgvbo = glGenBuffers(1)
+        glBindVertexArray(self.Bgvao)
+
+        glBindBuffer(GL_ARRAY_BUFFER, self.Bgvbo)
+
+        glBufferData(GL_ARRAY_BUFFER, self.Bgvertexes.nbytes, self.Bgvertexes, GL_STATIC_DRAW)
+        positionLocation = glGetAttribLocation(start.program, "position")
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                            8 * self.Bgvertexes.itemsize, ctypes.c_void_p(0))
+        glEnableVertexAttribArray(0)
+
+        colorLocation = glGetAttribLocation(start.program, "color")
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                            8 * self.Bgvertexes.itemsize, ctypes.c_void_p(12))
+        glEnableVertexAttribArray(1)
+
+        textureLocation = glGetAttribLocation(start.program, "texCoord")
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+                            8 * self.Bgvertexes.itemsize, ctypes.c_void_p(24))
+        glEnableVertexAttribArray(2)
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+ 
+        glBindVertexArray(0)
+        self.tex = Texture("textures/bg3.png")
+       
+        
+class Texture:
+    def __init__(self,tex):
+        self.texture = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, self.texture)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        image = pygame.image.load(tex).convert_alpha()
+        image_width,image_height = image.get_rect().size
+        img_data = pygame.image.tostring(image,'RGBA')
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image_width,image_height,0,GL_RGBA,GL_UNSIGNED_BYTE,img_data)
+        glGenerateMipmap(GL_TEXTURE_2D)
+
+
+
+
+
+
+
+
+
+
+
+
+
 def init():
     pygame.init()
     display = (500, 750)
