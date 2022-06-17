@@ -308,5 +308,33 @@ def main():
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
 
+        bird_y_upper = bird.birdVertexes[0][1]
+        bird_y_lower = bird.birdVertexes[3][1]
+        
+        if len(pipes) == 2:
+            pipe = pipes[-2]
+            pipe2 = pipes[-1]
+        else:
+            pipe = pipes[-4]
+            pipe2 = pipes[-3]
+        bird_pos = ([-0.8,-0.6], [bird.birdVertexes[0][1],bird.birdVertexes[1][1]])
+        if len(pipes) > 4:
+            pipes.pop(1)
+            pipes.pop(0)
+        
+        upper_block_y_lower = pipe.pipeVertex[0][1]
+        lower_block_y_upper = pipe2.pipeVertex[0][1]
+        x_limit = (pipe.pipeVertex[0][0],pipe.pipeVertex[3][0])
+        block_pos = (pipe.pipeVertex[0][1],pipe2.pipeVertex[1][1])
+        isCollided = check_collision(bird_pos, x_limit, block_pos)
+        
+        if (isCollided):
+            pygame.quit() 
+            quit()
+        
+        
+        pygame.display.flip()  
+        pygame.time.wait(10)
 
 
+main()
