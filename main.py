@@ -12,10 +12,14 @@ from OpenGL.GL.shaders import *
 import numpy as np
 import os
 from PIL import Image
+from pygame import mixer
+
 class Start:
     def __init__(self,vertex,fragment):
         
         pygame.init()
+        # pygame.font.init()
+        # pygame.mixer.init()
 
         pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 4)
         pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 1)
@@ -260,17 +264,19 @@ def check_collision(bird_pos, x, blocks_y_pos):
     return False
     
 pipe_len = 2
+score = 0
 
 def main():
-    global prev_block_pos, pipe_len
+    global prev_block_pos, pipe_len, score
     a=-0.005
     b=-0.006
     bg = Backgroundimage()
     bird = Bird()
     while True:
         y=round(random.uniform(-0.60, 0.60), 2)
-        prev_block_pos += 2
+        prev_block_pos +=  2
         if (prev_block_pos % 500 == 0):
+            score +=1
             pipe = Pipe(translate=(-0.5,0.05+y))
             pipe2= Pipe(translate=(-0.5,-2.25+y))
             pipes.append(pipe)
@@ -329,12 +335,48 @@ def main():
         isCollided = check_collision(bird_pos, x_limit, block_pos)
         
         if (isCollided):
+            score -=1
             pygame.quit() 
-            quit()
+            game_over_window()
         
         
         pygame.display.flip()  
         pygame.time.wait(10)
 
 
+def game_over_window():
+    global score
+    print('game over')
+    pygame.init()
+
+    display = (500, 500)
+    window = pygame.display.set_mode(display)
+    bg_img = pygame.image.load('textures/gameover.jpg')
+    bg_img = pygame.transform.scale(bg_img,(500,500))
+    if score < 0:   score = 0
+    font = pygame.font.SysFont("Arial", 50, bold=True)
+    text = font.render(f'Score: {score}', True, (255, 255, 255))
+    text2 = font.render(f'Game Over', True, (255, 255, 255))
+    restart = False
+
+    while True:
+        window.blit(bg_img, (0, 0))
+        window.blit(text, text.get_rect(center=window.get_rect().center))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    restart = True
+            
+
+        pygame.display.flip()
+        pygame.time.wait(10)
+
+
+
+mixer.init()
+mixer.music.load('sound/bg_sound.ogg')
+mixer.music.play(-1)
 main()
